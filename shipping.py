@@ -20,6 +20,12 @@ def save_selected_lane(file_path, selected_lane):
     with open(file_path, "w") as f:
         json.dump({"coordinates": selected_lane}, f, indent=2)
 
+# just a helper function to get data into format
+# for FRONTEND
+def flatten_lane(lane):
+    return [coordinate for point in lane for coordinate in point]
+
+
 def main():
     fragmented_lanes = load_fragmented_lanes("fragmented-utils/data/fragmented_shipping_lanes.json")
 
