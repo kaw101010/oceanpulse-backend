@@ -44,6 +44,27 @@ def get_species_data_by_date(species, month, yr):
     except requests.exceptions.RequestException as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/data/<species>/<int:yr>', methods=['GET'])
+def get_species_data_for_year(species, yr):
+    try:
+        # Calculate start and end dates for the entire year
+        start_date = datetime(yr, 1, 1).strftime('%Y-%m-%d')
+        end_date = datetime(yr + 1, 1, 1).strftime('%Y-%m-%d')
+        
+        # Call the OBIS API with the species name and year range
+        response = requests.get(
+            f"https://api.obis.org/v3/occurrence/points",
+            params={
+                'scientificname': species,
+                'startdate': start_date,
+                'enddate': end_date
+            }
+        )
+        response.raise_for_status()  # Raise an error for bad responses
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 # Error handlers
 @app.errorhandler(404)
 def not_found_error(error):
