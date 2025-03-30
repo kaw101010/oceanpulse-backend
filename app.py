@@ -3,6 +3,7 @@ from flask_cors import CORS
 import requests
 from datetime import datetime
 from urllib.parse import quote_plus
+from gemini import generate  # Import the generate function
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -64,6 +65,22 @@ def get_species_data_for_year(species, yr):
         return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/generate', methods=['POST'])
+def generate_content():
+    try:
+        # Get the prompt from the request JSON
+        data = request.get_json()
+        prompt = data.get('prompt', '')
+
+        if not prompt:
+            return jsonify({'status': '-1', 'message': 'Prompt is required'}), 400
+
+        # Call the generate function with the prompt
+        content = generate(prompt)
+        return jsonify({'status': '1', 'content': content}), 200
+    except Exception as e:
+        return jsonify({'status': '-1', 'message': str(e)}), 500
 
 # Error handlers
 @app.errorhandler(404)
