@@ -20,6 +20,15 @@ def save_selected_lane(file_path, selected_lane):
     with open(file_path, "w") as f:
         json.dump({"coordinates": selected_lane}, f, indent=2)
 
+def get_lanes_yearly(lanes, yr):
+    combined_lane = []
+
+    for month in range(1, 13):
+        lane = get_deterministic_lane(lanes, yr, month)
+        combined_lane.extend(lane)
+
+    return combined_lane
+
 # just a helper function to get data into format
 # for FRONTEND
 def flatten_lane(lane):

@@ -4,7 +4,7 @@ import requests
 from datetime import datetime
 from urllib.parse import quote_plus
 from gemini import generate
-from shipping import load_fragmented_lanes, get_deterministic_lane, flatten_lane
+from shipping import load_fragmented_lanes, get_deterministic_lane, flatten_lane, get_lanes_yearly
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -68,12 +68,29 @@ def get_species_data_for_year(species, yr):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
-@app.route('/shipping/<int:month>/<int:year>', methods=['GET'])
+@app.route('/data/shipping/<int:month>/<int:year>', methods=['GET'])
 def get_shipping_lane(year, month):
     try:
         fragmented_lanes = load_fragmented_lanes("fragmented-utils/data/fragmented_shipping_lanes.json")
 
         selected_lane = get_deterministic_lane(fragmented_lanes, year, month)
+        flattened = flatten_lane(selected_lane)
+
+        return jsonify({
+            'status': '1',
+            'lane': flattened
+        }), 200
+    except Exception as e:
+        return jsonify({'status': '-1', 'message': str(e)}), 500
+
+
+
+@app.route('/data/shipping/<int:year>', methods=['GET'])
+def get_annual_shipping_lanes(year):
+    try:
+        fragmented_lanes = load_fragmented_lanes("fragmented-utils/data/fragmented_shipping_lanes.json")
+
+        selected_lane = get_lanes_yearly(fragmented_lanes, year)
         flattened = flatten_lane(selected_lane)
 
         return jsonify({
