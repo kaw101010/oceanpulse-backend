@@ -18,14 +18,13 @@ def generate(prompt):
         types.Content(
             role="user",
             parts=[
-                types.Part.from_text(text=prompt),
+                types.Part.from_text(text=prompt + "Answer the above question in "
+                "a maximum of 20 words."),
             ],
         ),
     ]
     generate_content_config = types.GenerateContentConfig(
         response_mime_type="text/plain",
-        max_output_tokens=60,
-        temperature=0.1
     )
 
     result = ""
